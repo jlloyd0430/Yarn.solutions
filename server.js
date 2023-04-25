@@ -57,7 +57,7 @@ app.use(
 app.use("/public", express.static(path.resolve("./public")));
 
 // EXPRESS SESSION
-const MongoStore = require("connect-mongo");
+const store = require("./database/session");
 const User = require("./models/userModel");
 
 app.use(
@@ -65,9 +65,7 @@ app.use(
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.DATABASE_URL,
-    }),
+    store: store,
   })
 );
 
