@@ -1,71 +1,73 @@
-const methodOverride = require('method-override');
-const session = require('express-session');
-const connectDB = require('./database/connection');
-const dotenv = require('dotenv');
-const bodyparser = require('body-parser');
-const path = require('path');
-const morgan = require('morgan');
-const router = require('./routes/router');
-const express = require('express');
+const methodOverride = require("method-override");
+const session = require("express-session");
+const connectDB = require("./database/connection");
+const dotenv = require("dotenv");
+const bodyparser = require("body-parser");
+const path = require("path");
+const morgan = require("morgan");
+const router = require("./routes/router");
+const express = require("express");
 const app = express();
 
-const setLocals = require('./middleware/setLocals');
-const Message = require('./models/messageModel');
+const setLocals = require("./middleware/setLocals");
+const Message = require("./models/messageModel");
 
-const http = require('http');
+const http = require("http");
 const server = http.Server(app);
-const socketIO = require('socket.io');
+const socketIO = require("socket.io");
 const io = socketIO(server);
 
 app.use(express.json());
 
 // METHOD_OVERRIDE
-app.use(methodOverride('_method'));
+app.use(methodOverride("_method"));
 
 // MORGAN
-app.use(morgan('tiny'));
+app.use(morgan("tiny"));
 
 // BODY-PARSER
 app.use(bodyparser.urlencoded({ extended: true }));
 
 // DOTENV
-dotenv.config({ path: 'config.env' });
+dotenv.config({ path: "config.env" });
 
 // EJS
-app.set('view engine', 'ejs');
+app.set("view engine", "ejs");
 
 // Assets
 app.use(
-  '/bootstrap',
-  express.static(path.resolve(__dirname, './node_modules/bootstrap/dist'))
+  "/bootstrap",
+  express.static(path.resolve(__dirname, "./node_modules/bootstrap/dist"))
 );
 
 app.use(
-  '/fontawesome',
+  "/fontawesome",
   express.static(
-    path.resolve(__dirname, './node_modules/@fortawesome/fontawesome-free')
+    path.resolve(__dirname, "./node_modules/@fortawesome/fontawesome-free")
   )
 );
 
 app.use(
-  '/file-upload-with-preview',
+  "/file-upload-with-preview",
   express.static(
-    path.resolve(__dirname, './node_modules/file-upload-with-preview/dist')
+    path.resolve(__dirname, "./node_modules/file-upload-with-preview/dist")
   )
 );
 
-app.use('/public', express.static(path.resolve('./public')));
+app.use("/public", express.static(path.resolve("./public")));
 
 // EXPRESS SESSION
-const store = require('./database/session');
-const User = require('./models/userModel');
+const MongoStore = require("connect-mongo");
+const User = require("./models/userModel");
 
 app.use(
   session({
     secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: false,
-    store: store,
+    store: MongoStore.create({
+      mongoUrl: process.env.DATABASE_URL,
+    }),
   })
 );
 
@@ -74,10 +76,10 @@ app.use(setLocals);
 
 // SOCKET
 let chatUsers = {};
-io.on('connection', (socket) => {
-  socket.on('user-connected', async (senderUserName) => {
+io.on("connection", (socket) => {
+  socket.on("user-connected", async (senderUserName) => {
     chatUsers[senderUserName] = socket.id;
-    console.log('p', chatUsers);
+    console.log("p", chatUsers);
     let senderAllMsgs = await Message.find({
       sender: senderUserName,
     });
@@ -103,7 +105,7 @@ io.on('connection', (socket) => {
     // socket.emit("find-receiver", uniqueReceiver.messageReceivers);
   });
 
-  socket.on('send-message', async function (data) {
+  socket.on("send-message", async function (data) {
     let sender = data.sender;
     let receiver = chatUsers[data.receiver];
     let message = data.messageBody;
@@ -144,14 +146,14 @@ io.on('connection', (socket) => {
       messageReceivers: msg.receiver,
     });
 
-    socket.to(receiver).emit('send-specific-user', {
+    socket.to(receiver).emit("send-specific-user", {
       sender: sender,
       receiver: data.receiver,
       messageBody: message,
     });
   });
 
-  socket.on('user-selected', async (data) => {
+  socket.on("user-selected", async (data) => {
     console.log(data);
     let msg = await Message.find({
       $or: [
@@ -159,7 +161,7 @@ io.on('connection', (socket) => {
         { $and: [{ receiver: data.sender }, { sender: data.receiver }] },
       ],
     });
-    socket.emit('receiver-user-selected', msg);
+    socket.emit("receiver-user-selected", msg);
   });
 });
 
@@ -167,7 +169,7 @@ io.on('connection', (socket) => {
 connectDB();
 
 // ROOT ROUTE
-app.use('/', router);
+app.use("/", router);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Listen On PORT ${PORT}`));
