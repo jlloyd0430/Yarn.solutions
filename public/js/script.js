@@ -11,7 +11,7 @@ const addSubCategoryOnIndexPopularServicesSlider = document.getElementById(
 const setCategoryGrid = document.getElementById('setCategoryGrid');
 
 window.onload = () => {
-  if (passTitle.dataset.passtitle !== 'freele') {
+  if (passTitle.dataset.passtitle !== 'Yarn') {
     navbar[0].classList.add('active');
     headerSearch.classList.remove('d-none');
   }
