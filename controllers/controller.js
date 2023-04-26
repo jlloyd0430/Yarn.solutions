@@ -21,7 +21,7 @@ exports.homeRoutes = async (req, res) => {
     .sort({ createdAt: -1 })
     .limit(4);
   return res.status(200).render('index', {
-    title: 'freele',
+    title: 'yarn',
     service: service,
   });
 };
