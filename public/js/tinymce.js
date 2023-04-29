@@ -1,6 +1,6 @@
 tinymce.init({
   selector: "#serviceDescription",
-  apiKey: TINY_CLOUD_API_KEY,
+  apiKey: process.env.TINY_CLOUD_API_KEY,
   plugins: [
     "advlist lists link autolink autosave code",
     "preview",
