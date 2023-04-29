@@ -15,7 +15,7 @@ window.onload = () => {
     navbar[0].classList.add("active");
     headerSearch.classList.remove("d-none");
   }
-  if (passTitle.dataset.passtitle === "Yarn" && window.pageYOffset > 0) {
+  if (passTitle.dataset.passtitle === "freele" && window.pageYOffset > 0) {
     navbar[0].classList.add("active");
     headerSearch.classList.remove("d-none");
   }
@@ -237,7 +237,7 @@ function setSubcategoryForPopularServicesOnLoadHome() {
   }
 }
 
-if (passTitle.dataset.passtitle === "freele") {
+if (passTitle.dataset.passtitle === "yarn") {
   setCategoryForPopularServicesOnLoadHome();
   setSubcategoryForPopularServicesOnLoadHome();
 }
