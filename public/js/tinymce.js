@@ -1,12 +1,12 @@
 tinymce.init({
   selector: "#serviceDescription",
-  apiKey: "68ig7ixv8x5wcfkmmv2fod17zy042hl4qba8p5ngvavyjie5",
+  apiKey: process.env.TINY_CLOUD_API_KEY,
   plugins: [
     "advlist lists link autolink autosave code",
     "preview",
     "searchreplace",
     "wordcount",
-    "media table emoticons image imagetools",
+    "media table emoticons image imagetools"
   ],
   toolbar:
     "undo redo | styleselect | fontselect | fontsizeselect | bold italic underline | alignLeft alignCenter alignRight alignJustify | bullist numlist outdent indent | link | foreColor backcolor emoticons | preview table",
@@ -15,5 +15,6 @@ tinymce.init({
     editor.on("change", function () {
       tinymce.triggerSave();
     });
-  },
+  }
 });
+
