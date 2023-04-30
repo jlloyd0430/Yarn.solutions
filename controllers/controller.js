@@ -1,41 +1,41 @@
 // const mime = require("mime-types");
-const path = require('path');
-const bcrypt = require('bcrypt');
-const { validationResult } = require('express-validator');
-const generateServiceFilter = require('../middleware/generateServiceFilter');
+const path = require("path");
+const bcrypt = require("bcrypt");
+const { validationResult } = require("express-validator");
+const generateServiceFilter = require("../middleware/generateServiceFilter");
 
-const Stripe = require('stripe');
-const User = require('../models/userModel');
-const Service = require('../models/serviceModel');
-const Order = require('../models/orderModel');
-const FeedBack = require('../models/feedBackModel');
-const JobPost = require('../models/jobPostModel');
-const JobPostOrder = require('../models/jobPostOrderModel');
+const Stripe = require("stripe");
+const User = require("../models/userModel");
+const Service = require("../models/serviceModel");
+const Order = require("../models/orderModel");
+const FeedBack = require("../models/feedBackModel");
+const JobPost = require("../models/jobPostModel");
+const JobPostOrder = require("../models/jobPostOrderModel");
 
 exports.homeRoutes = async (req, res) => {
   const service = await Service.find()
     .populate({
-      path: 'userId',
-      select: 'username profileImage',
+      path: "userId",
+      select: "username profileImage",
     })
     .sort({ createdAt: -1 })
     .limit(4);
-  return res.status(200).render('index', {
-    title: 'yarn',
+  return res.status(200).render("index", {
+    title: "yarn",
     service: service,
   });
 };
 
 exports.signInGetRoutes = async (req, res) => {
-  return res.status(200).render('signin', {
-    title: 'signin',
+  return res.status(200).render("signin", {
+    title: "signin",
     user: new User(),
   });
 };
 
 exports.signUpGetRoutes = async (req, res) => {
-  return res.status(200).render('signup', {
-    title: 'signup',
+  return res.status(200).render("signup", {
+    title: "signup",
     user: new User(),
   });
 };
@@ -45,38 +45,38 @@ exports.profileGetRoutes = async (req, res) => {
     username: req.params.username,
   });
   if (!user)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
   let service = await Service.find({ userId: user.id })
     .populate({
-      path: 'userId',
-      select: 'username profileImage',
+      path: "userId",
+      select: "username profileImage",
     })
-    .sort('-createdAt');
+    .sort("-createdAt");
   const jobPost = await JobPost.find({ userId: user.id })
     .populate({
-      path: 'userId',
-      select: 'username profileImage',
+      path: "userId",
+      select: "username profileImage",
     })
     .populate({
-      path: 'sentRequest.requestSender',
-      select: 'username profileImage',
+      path: "sentRequest.requestSender",
+      select: "username profileImage",
     })
-    .sort('-createdAt');
+    .sort("-createdAt");
   const receiveFeedBacks = await FeedBack.find({
     _id: { $in: user.receiveFeedBack },
   })
     .populate({
-      path: 'sender receiver',
-      select: 'username profileImage',
+      path: "sender receiver",
+      select: "username profileImage",
     })
     .populate({
-      path: 'service',
-      select: 'slug',
+      path: "service",
+      select: "slug",
     });
-  return res.status(200).render('profile', {
-    title: 'profile',
+  return res.status(200).render("profile", {
+    title: "profile",
     user: user,
     service: service,
     jobPost,
@@ -89,11 +89,11 @@ exports.editProfileGetRoutes = async (req, res) => {
     username: req.params.username,
   });
   if (!user)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
-  return res.status(200).render('editProfile', {
-    title: 'editProfile',
+  return res.status(200).render("editProfile", {
+    title: "editProfile",
     user: user,
   });
 };
@@ -103,11 +103,11 @@ exports.createNewServiceGetRoutes = async (req, res) => {
     username: req.params.username,
   });
   if (!user)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
-  return res.status(200).render('uploadService', {
-    title: 'uploadService',
+  return res.status(200).render("uploadService", {
+    title: "uploadService",
     user: user,
     service: new Service(),
   });
@@ -117,24 +117,24 @@ exports.singleServiceGetRoutes = async (req, res) => {
   let service = await Service.findOne({
     slug: req.params.slug,
   }).populate({
-    path: 'userId',
-    select: 'username profileImage',
+    path: "userId",
+    select: "username profileImage",
   });
 
   if (!service || req.params.username !== service.userId.username)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
   const feedbacks = await FeedBack.find({ _id: service.feedback }).populate({
-    path: 'sender',
-    select: 'username profileImage',
+    path: "sender",
+    select: "username profileImage",
   });
 
   // console.log(feedbacks);
 
-  return res.status(200).render('singleService', {
-    title: 'service',
+  return res.status(200).render("singleService", {
+    title: "service",
     service: service,
     feedbacks,
   });
@@ -145,20 +145,20 @@ exports.singleServiceEditGetRoutes = async (req, res) => {
     username: req.params.username,
   });
   if (!user)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
   let service = await Service.findOne({ slug: req.params.slug }).populate({
-    path: 'userId',
-    select: 'username profileImage',
+    path: "userId",
+    select: "username profileImage",
   });
   if (!service || req.params.username !== service.userId.username)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
-  return res.status(200).render('editService', {
-    title: 'editService',
+  return res.status(200).render("editService", {
+    title: "editService",
     user: user,
     service: service,
   });
@@ -172,8 +172,8 @@ exports.signInPostRoutes = async (req, res) => {
 
   let error = validationResult(req);
   if (!error.isEmpty()) {
-    return res.status(400).render('signin', {
-      title: 'signin',
+    return res.status(400).render("signin", {
+      title: "signin",
       errors: error,
       user: user,
     });
@@ -196,12 +196,12 @@ exports.signInPostRoutes = async (req, res) => {
 
     if (!loginCheck) {
       error.errors.push({
-        msg: 'Invalid username or password',
-        param: 'invalidSignIn',
-        location: 'body',
+        msg: "Invalid username or password",
+        param: "invalidSignIn",
+        location: "body",
       });
-      return res.status(400).render('signin', {
-        title: 'signin',
+      return res.status(400).render("signin", {
+        title: "signin",
         errors: error,
         user: user,
       });
@@ -215,8 +215,8 @@ exports.signInPostRoutes = async (req, res) => {
     }
   } catch (error) {
     console.log(error);
-    return res.status(400).render('signin', {
-      title: 'signin',
+    return res.status(400).render("signin", {
+      title: "signin",
       errors: error,
       user: user,
     });
@@ -237,20 +237,20 @@ exports.signUpPostRoutes = async (req, res) => {
   });
   if (userName) {
     error.errors.push({
-      msg: 'duplicate username',
-      param: 'username',
-      location: 'body',
+      msg: "duplicate username",
+      param: "username",
+      location: "body",
     });
-    return res.status(400).render('signup', {
-      title: 'signup',
+    return res.status(400).render("signup", {
+      title: "signup",
       errors: error,
       user: user,
     });
   }
 
   if (!error.isEmpty()) {
-    return res.status(400).render('signup', {
-      title: 'signup',
+    return res.status(400).render("signup", {
+      title: "signup",
       errors: error,
       user: user,
     });
@@ -271,14 +271,14 @@ exports.signUpPostRoutes = async (req, res) => {
         return res.status(200).redirect(`/user/${newUser.username}`);
       })
       .catch(() =>
-        res.status(400).render('signup', {
-          title: 'signup',
+        res.status(400).render("signup", {
+          title: "signup",
           user: user,
         })
       );
   } catch (error) {
-    res.status(400).render('signup', {
-      title: 'signup',
+    res.status(400).render("signup", {
+      title: "signup",
       user: user,
     });
   }
@@ -286,29 +286,29 @@ exports.signUpPostRoutes = async (req, res) => {
 
 exports.logOutRoutes = async (req, res) => {
   req.session.destroy(() => {
-    res.clearCookie('connect.sid');
-    res.status(400).redirect('/signin');
+    res.clearCookie("connect.sid");
+    res.status(400).redirect("/signin");
   });
 };
 
 exports.editProfilePutRoutes = async (req, res) => {
   let user = new User({
-    userBio: req.body.userBio || '',
-    fullname: req.body.fullname || '',
+    userBio: req.body.userBio || "",
+    fullname: req.body.fullname || "",
     username: req.body.username,
     email: req.body.email,
     password: req.session.sUser.password,
-    phonenumber: req.body.phonenumber || '',
-    profileImage: req.session.sUser.profileImage || '',
-    address: req.body.address || '',
+    phonenumber: req.body.phonenumber || "",
+    profileImage: req.session.sUser.profileImage || "",
+    address: req.body.address || "",
   });
 
   if (req.file) user.profileImage = req.file.filename;
 
   let error = validationResult(req);
   if (!error.isEmpty()) {
-    return res.status(400).render('editProfile', {
-      title: 'editProfile',
+    return res.status(400).render("editProfile", {
+      title: "editProfile",
       errors: error,
       user: user,
     });
@@ -318,20 +318,20 @@ exports.editProfilePutRoutes = async (req, res) => {
     username: req.session.sUser.username,
   });
   if (!findUser)
-    return res.status(400).render('editProfile', {
-      title: 'editProfile',
+    return res.status(400).render("editProfile", {
+      title: "editProfile",
       user: user,
     });
 
   let newUser = {
-    userBio: req.body.userBio || '',
-    fullname: req.body.fullname || '',
+    userBio: req.body.userBio || "",
+    fullname: req.body.fullname || "",
     username: req.body.username,
     email: req.body.email,
     password: req.session.sUser.password,
-    phonenumber: req.body.phonenumber || '',
-    profileImage: req.session.sUser.profileImage || '',
-    address: req.body.address || '',
+    phonenumber: req.body.phonenumber || "",
+    profileImage: req.session.sUser.profileImage || "",
+    address: req.body.address || "",
   };
 
   if (req.file) newUser.profileImage = req.file.filename;
@@ -342,12 +342,12 @@ exports.editProfilePutRoutes = async (req, res) => {
     });
     if (checkUser) {
       error.errors.push({
-        msg: 'duplicate username',
-        param: 'username',
-        location: 'body',
+        msg: "duplicate username",
+        param: "username",
+        location: "body",
       });
-      return res.status(400).render('editProfile', {
-        title: 'editProfile',
+      return res.status(400).render("editProfile", {
+        title: "editProfile",
         errors: error,
         user: user,
       });
@@ -370,16 +370,16 @@ exports.editProfilePutRoutes = async (req, res) => {
         return res.status(200).redirect(`/user/${newUser.username}`);
       })
       .catch((err) => {
-        console.log('catch', err);
-        res.status(400).render('editProfile', {
-          title: 'editProfile',
+        console.log("catch", err);
+        res.status(400).render("editProfile", {
+          title: "editProfile",
           user: user,
         });
       });
   } catch (error) {
-    console.log('catch', error);
-    res.status(400).render('editProfile', {
-      title: 'editProfile',
+    console.log("catch", error);
+    res.status(400).render("editProfile", {
+      title: "editProfile",
       user: user,
     });
   }
@@ -391,8 +391,8 @@ exports.createNewServicePostRoutes = async (req, res) => {
     username: req.params.username,
   });
   if (!user)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
   const {
@@ -475,8 +475,8 @@ exports.createNewServicePostRoutes = async (req, res) => {
   if (serviceDescription) serviceDescriptionError = false;
 
   if (premiumError || standardError || serviceDescriptionError)
-    return res.status(200).render('uploadService', {
-      title: 'uploadService',
+    return res.status(200).render("uploadService", {
+      title: "uploadService",
       user: user,
       service,
       standardError,
@@ -509,8 +509,8 @@ exports.createNewServicePostRoutes = async (req, res) => {
       .status(200)
       .redirect(`/user/${user.username}/service/${newSingleService.slug}`);
   } catch (error) {
-    return res.status(200).render('uploadService', {
-      title: 'uploadService',
+    return res.status(200).render("uploadService", {
+      title: "uploadService",
       user: user,
       service,
     });
@@ -521,13 +521,13 @@ exports.allServicesGetRoutes = async (req, res) => {
   const totalItemPerPage = 4;
   const currentPageNumber = parseInt(req.query.page) || 1;
 
-  const filter = req.query.filter || 'recent';
+  const filter = req.query.filter || "recent";
   const beforeDate = generateServiceFilter(filter.toLowerCase());
 
   let service, totalServices;
   if (parseInt(req.query.minimumPrice) > parseInt(req.query.maximumPrice)) {
-    return res.status(200).render('allServices', {
-      title: 'All Services',
+    return res.status(200).render("allServices", {
+      title: "All Services",
       service: [],
       filter: filter,
       totalPages: 0,
@@ -540,7 +540,7 @@ exports.allServicesGetRoutes = async (req, res) => {
   if (req.query.minimumPrice && req.query.maximumPrice) {
     priceFilter = true;
     service = await Service.find({
-      'pricing.price': {
+      "pricing.price": {
         $elemMatch: {
           $gte: parseInt(req.query.minimumPrice),
           $lte: parseInt(req.query.maximumPrice),
@@ -548,15 +548,15 @@ exports.allServicesGetRoutes = async (req, res) => {
       },
     })
       .populate({
-        path: 'userId',
-        select: 'username profileImage',
+        path: "userId",
+        select: "username profileImage",
       })
-      .sort('pricing.price')
+      .sort("pricing.price")
       .skip(currentPageNumber * totalItemPerPage - totalItemPerPage)
       .limit(totalItemPerPage);
 
     totalServices = await Service.countDocuments({
-      'pricing.price': {
+      "pricing.price": {
         $elemMatch: {
           $gte: parseInt(req.query.minimumPrice),
           $lte: parseInt(req.query.maximumPrice),
@@ -568,8 +568,8 @@ exports.allServicesGetRoutes = async (req, res) => {
       beforeDate ? { createdAt: { $gt: beforeDate } } : {}
     )
       .populate({
-        path: 'userId',
-        select: 'username profileImage',
+        path: "userId",
+        select: "username profileImage",
       })
       .sort(beforeDate ? { createdAt: 1 } : { createdAt: -1 })
       .skip(currentPageNumber * totalItemPerPage - totalItemPerPage)
@@ -582,8 +582,8 @@ exports.allServicesGetRoutes = async (req, res) => {
 
   let totalPages = Math.ceil(totalServices / totalItemPerPage);
 
-  return res.status(200).render('allServices', {
-    title: 'All Services',
+  return res.status(200).render("allServices", {
+    title: "All Services",
     service: service,
     filter: filter,
     totalPages,
@@ -601,17 +601,17 @@ exports.editServicesPutRoutes = async (req, res) => {
     username: req.params.username,
   });
   if (!user)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
   let service = await Service.findOne({ slug: req.params.slug }).populate({
-    path: 'userId',
-    select: 'username profileImage',
+    path: "userId",
+    select: "username profileImage",
   });
   if (!service || req.params.username !== service.userId.username)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
   const {
@@ -696,8 +696,8 @@ exports.editServicesPutRoutes = async (req, res) => {
   if (serviceDescription) serviceDescriptionError = false;
 
   if (premiumError || standardError || serviceDescriptionError)
-    return res.status(200).render('editService', {
-      title: 'editService',
+    return res.status(200).render("editService", {
+      title: "editService",
       user: user,
       service: checkService,
       standardError,
@@ -718,7 +718,7 @@ exports.editServicesPutRoutes = async (req, res) => {
     thumbnailImage: thumbnailImage,
   };
   if (serviceTitle !== service.serviceTitle) {
-    console.log('pppppppp');
+    console.log("pppppppp");
     let serviceModel = new Service();
     serviceModel.slug = await serviceModel.slugControl(serviceTitle);
     editedService.slug = serviceModel.slug;
@@ -726,7 +726,7 @@ exports.editServicesPutRoutes = async (req, res) => {
 
   if (
     editedService.thumbnailImage !== service.thumbnailImage &&
-    req.file.filename !== 'undefined'
+    req.file.filename !== "undefined"
   )
     editedService.thumbnailImage = req.file.filename;
 
@@ -736,15 +736,15 @@ exports.editServicesPutRoutes = async (req, res) => {
         res.status(200).redirect(`/user/${user.username}/service/${data.slug}`)
       )
       .catch(() =>
-        res.status(400).render('editService', {
-          title: 'editService',
+        res.status(400).render("editService", {
+          title: "editService",
           user: user,
           service: service,
         })
       );
   } catch (error) {
-    return res.status(400).render('editService', {
-      title: 'editService',
+    return res.status(400).render("editService", {
+      title: "editService",
       user: user,
       service: service,
     });
@@ -756,17 +756,17 @@ exports.deleteServiceGetRoutes = async (req, res) => {
     username: req.params.username,
   });
   if (!user)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
   let service = await Service.findOne({ slug: req.params.slug }).populate({
-    path: 'userId',
-    select: 'username profileImage',
+    path: "userId",
+    select: "username profileImage",
   });
   if (!service || req.params.username !== service.userId.username)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
   try {
@@ -776,8 +776,8 @@ exports.deleteServiceGetRoutes = async (req, res) => {
     });
     return res.status(400).redirect(`/user/${user.username}`);
   } catch (error) {
-    return res.status(400).render('singleService', {
-      title: 'singleService',
+    return res.status(400).render("singleService", {
+      title: "singleService",
       user: user,
       service: service,
     });
@@ -787,13 +787,13 @@ exports.deleteServiceGetRoutes = async (req, res) => {
 exports.searchServiceGetRoutes = async (req, res) => {
   let searchItem = req.query.searchItem;
   if (!searchItem)
-    return res.render('search', {
-      title: 'search',
+    return res.render("search", {
+      title: "search",
       service: [],
       searchItem,
     });
   try {
-    let searchObj = { $regex: searchItem, $options: '$i' };
+    let searchObj = { $regex: searchItem, $options: "$i" };
 
     let service = await Service.find({
       $or: [
@@ -803,20 +803,20 @@ exports.searchServiceGetRoutes = async (req, res) => {
         { serviceDescription: searchObj },
       ],
     }).populate({
-      path: 'userId',
-      select: 'username profileImage',
+      path: "userId",
+      select: "username profileImage",
     });
-    if (!service) return res.status(404).redirect('/404');
+    if (!service) return res.status(404).redirect("/404");
 
-    return res.render('search', {
-      title: 'search',
+    return res.render("search", {
+      title: "search",
       service,
       searchItem,
     });
   } catch (error) {
-    return res.render('404', {
-      title: '404',
-      service,
+    return res.render("404", {
+      title: "404",
+      Service,
       searchItem,
     });
   }
@@ -826,16 +826,16 @@ exports.orderGetRoutes = async (req, res) => {
   try {
     let order = await Order.findById(req.params.orderId)
       .populate({
-        path: 'service',
-        select: 'serviceTitle pricing thumbnailImage slug',
+        path: "service",
+        select: "serviceTitle pricing thumbnailImage slug",
         populate: {
-          path: 'userId',
-          select: 'username',
+          path: "userId",
+          select: "username",
         },
       })
       .populate({
-        path: 'user',
-        select: 'username',
+        path: "user",
+        select: "username",
       });
 
     if (
@@ -843,15 +843,15 @@ exports.orderGetRoutes = async (req, res) => {
       (order.user.username !== req.session.sUser.username &&
         order.user.username !== req.params.username)
     ) {
-      return res.status(404).redirect('/404');
+      return res.status(404).redirect("/404");
     }
     // console.log(order);
-    return res.render('order', {
-      title: 'order',
+    return res.render("order", {
+      title: "order",
       order: order,
     });
   } catch (error) {
-    return res.status(404).redirect('/404');
+    return res.status(404).redirect("/404");
   }
 };
 
@@ -859,31 +859,31 @@ exports.orderDeliveryGetRoutes = async (req, res) => {
   try {
     let order = await Order.findById(req.params.orderId)
       .populate({
-        path: 'service',
-        select: 'serviceTitle pricing thumbnailImage slug',
+        path: "service",
+        select: "serviceTitle pricing thumbnailImage slug",
         populate: {
-          path: 'userId',
-          select: 'username',
+          path: "userId",
+          select: "username",
         },
       })
       .populate({
-        path: 'user',
-        select: 'username',
+        path: "user",
+        select: "username",
       });
     if (
       !order ||
       (order.service.userId.username !== req.session.sUser.username &&
         order.service.userId.username !== req.params.username)
     ) {
-      return res.status(404).redirect('/404');
+      return res.status(404).redirect("/404");
     }
     // console.log(order);
-    return res.render('orderDelivery', {
-      title: 'orderDelivery',
+    return res.render("orderDelivery", {
+      title: "orderDelivery",
       order: order,
     });
   } catch (error) {
-    return res.status(404).redirect('/404');
+    return res.status(404).redirect("/404");
   }
 };
 
@@ -893,27 +893,27 @@ exports.checkoutGetRoutes = async (req, res) => {
   });
 
   if (!user)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
   let service = await Service.findOne({ slug: req.params.slug }).populate({
-    path: 'userId',
-    select: 'username profileImage',
+    path: "userId",
+    select: "username profileImage",
   });
   if (!service)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
   if (service.userId.username === req.session.sUser.username)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
-  return res.render('checkout', {
+  return res.render("checkout", {
     keyPublishable: process.env.STRIPE_PUBLISHABLE_KEY,
-    title: 'checkout',
+    title: "checkout",
     index: req.query.index,
     service: service,
   });
@@ -946,8 +946,8 @@ exports.checkoutPostRoutes = async (req, res) => {
   const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
   let service = await Service.findOne({ slug: req.params.slug }).populate({
-    path: 'userId',
-    select: 'username profileImage',
+    path: "userId",
+    select: "username profileImage",
   });
 
   const user = await User.findOne({ username: req.params.username });
@@ -956,8 +956,8 @@ exports.checkoutPostRoutes = async (req, res) => {
   });
 
   if (!service || !user)
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
 
   let amount = parseInt(
@@ -975,8 +975,8 @@ exports.checkoutPostRoutes = async (req, res) => {
     .then((customer) =>
       stripe.charges.create({
         amount,
-        description: 'Sample Charge',
-        currency: 'usd',
+        description: "Sample Charge",
+        currency: "usd",
         customer: customer.id,
       })
     )
@@ -1000,23 +1000,23 @@ exports.checkoutPostRoutes = async (req, res) => {
         })
         .catch((err) => {
           console.log(err);
-          return res.status(404).redirect('/404');
+          return res.status(404).redirect("/404");
         });
     })
     .catch((err) => {
       console.log(err);
-      return res.status(404).redirect('/404');
+      return res.status(404).redirect("/404");
     });
 };
 
 exports.deliverOrderFilePostRoutes = async (req, res) => {
   try {
     let order = await Order.findById(req.params.orderId).populate({
-      path: 'service',
-      select: 'slug',
+      path: "service",
+      select: "slug",
       populate: {
-        path: 'userId',
-        select: 'username',
+        path: "userId",
+        select: "username",
       },
     });
     if (
@@ -1024,7 +1024,7 @@ exports.deliverOrderFilePostRoutes = async (req, res) => {
       (order.service.userId.username !== req.session.sUser.username &&
         order.service.userId.username !== req.params.username)
     ) {
-      return res.status(404).redirect('/404');
+      return res.status(404).redirect("/404");
     }
     let deliverProduct = [];
     for (let product = 0; product < req.files.length; product++) {
@@ -1038,9 +1038,9 @@ exports.deliverOrderFilePostRoutes = async (req, res) => {
       deliveryWork: deliverProduct,
     })
       .then(() => res.redirect(`/user/${req.session.sUser.username}/order`))
-      .catch(() => res.status(404).redirect('/404'));
+      .catch(() => res.status(404).redirect("/404"));
   } catch (error) {
-    return res.status(404).redirect('/404');
+    return res.status(404).redirect("/404");
   }
 };
 
@@ -1048,22 +1048,22 @@ exports.downloadDeliveryProductGetRoutes = async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId);
     if (!order) {
-      return res.status(404).render('404', {
-        title: '404',
+      return res.status(404).render("404", {
+        title: "404",
       });
     }
     const productIndex = req.params.productIndex;
     const productFilename = req.params.productFilename;
     const dir =
-      path.join(__dirname, '../') + `/public/uploads/` + productFilename;
+      path.join(__dirname, "../") + `/public/uploads/` + productFilename;
 
-    res.set('Content-disposition', 'attachment; filename=' + productFilename);
+    res.set("Content-disposition", "attachment; filename=" + productFilename);
     const setMimeType = order.deliveryWork[productIndex].mimetype;
-    res.set('Content-Type', setMimeType);
+    res.set("Content-Type", setMimeType);
     res.download(dir);
   } catch (error) {
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
   }
 };
@@ -1071,80 +1071,80 @@ exports.downloadDeliveryProductGetRoutes = async (req, res) => {
 exports.myOrderGetRoutes = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.params.username });
-    if (!user) return res.status(404).redirect('/404');
+    if (!user) return res.status(404).redirect("/404");
 
     let order = await Order.find({ user: user.id })
       .populate({
-        path: 'service',
-        select: 'serviceTitle pricing thumbnailImage slug',
+        path: "service",
+        select: "serviceTitle pricing thumbnailImage slug",
         populate: {
-          path: 'userId',
-          select: 'username',
+          path: "userId",
+          select: "username",
         },
       })
       .populate({
-        path: 'user',
-        select: 'username',
+        path: "user",
+        select: "username",
       });
     let getOrder = await Order.find({ _id: { $in: user.getOrders } })
       .populate({
-        path: 'service',
-        select: 'serviceTitle pricing thumbnailImage slug',
+        path: "service",
+        select: "serviceTitle pricing thumbnailImage slug",
         populate: {
-          path: 'userId',
-          select: 'username',
+          path: "userId",
+          select: "username",
         },
       })
       .populate({
-        path: 'user',
-        select: 'username',
+        path: "user",
+        select: "username",
       });
 
     let jobPostOrder = await JobPostOrder.find({
       _id: { $in: user.createJobPostOrders },
     })
       .populate({
-        path: 'jobPost',
-        select: 'postServiceDetailsDescription price',
+        path: "jobPost",
+        select: "postServiceDetailsDescription price",
         populate: {
-          path: 'userId',
-          select: 'username',
+          path: "userId",
+          select: "username",
         },
       })
       .populate({
-        path: 'request.requestSender',
-        select: 'username profileImage',
-        model: 'User',
+        path: "request.requestSender",
+        select: "username profileImage",
+        model: "User",
       });
 
     let getJobPostOrder = await JobPostOrder.find({
       _id: { $in: user.getJobPostOrders },
     })
       .populate({
-        path: 'jobPost',
-        select: 'postServiceDetailsDescription price',
+        path: "jobPost",
+        select: "postServiceDetailsDescription price",
         populate: {
-          path: 'userId',
-          select: 'username',
+          path: "userId",
+          select: "username",
         },
       })
       .populate({
-        path: 'request.requestSender',
-        select: 'username profileImage',
-        model: 'User',
+        path: "request.requestSender",
+        select: "username profileImage",
+        model: "User",
       });
 
     // console.log(jobPostOrder);
 
-    return res.render('myOrder', {
-      title: 'myOrder',
+    return res.render("myOrder", {
+      title: "myOrder",
       order: order,
       getOrder: getOrder,
       jobPostOrder,
       getJobPostOrder,
     });
   } catch (error) {
-    return res.status(404).redirect('/404');
+    return res.status(404).redirect("/404");
   }
 };
 
@@ -1152,20 +1152,20 @@ exports.completeOrderPutRoutes = async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId)
       .populate({
-        path: 'service',
-        select: 'serviceTitle pricing thumbnailImage slug',
+        path: "service",
+        select: "serviceTitle pricing thumbnailImage slug",
         populate: {
-          path: 'userId',
-          select: 'username',
+          path: "userId",
+          select: "username",
         },
       })
       .populate({
-        path: 'user',
-        select: 'username',
+        path: "user",
+        select: "username",
       });
     if (!order) {
       console.log(error);
-      return res.status(404).redirect('/404');
+      return res.status(404).redirect("/404");
     }
 
     const seller = await User.findById(order.service.userId._id);
@@ -1198,7 +1198,7 @@ exports.completeOrderPutRoutes = async (req, res) => {
       );
   } catch (error) {
     console.log(error);
-    return res.status(404).redirect('/404');
+    return res.status(404).redirect("/404");
   }
 };
 
@@ -1208,18 +1208,18 @@ exports.sendFeedBackPostRoutes = async (req, res) => {
 
   const order = await Order.findById(req.params.orderId)
     .populate({
-      path: 'service',
-      select: 'serviceTitle userId pricing thumbnailImage slug',
+      path: "service",
+      select: "serviceTitle userId pricing thumbnailImage slug",
     })
     .populate({
-      path: 'userId',
-      select: 'username profileImage',
+      path: "userId",
+      select: "username profileImage",
     });
 
   const receiver = order.service.userId._id;
   const service = order.service;
 
-  if (!sender && !order) return res.status(404).redirect('/404');
+  if (!sender && !order) return res.status(404).redirect("/404");
 
   try {
     const feedback = new FeedBack({
@@ -1245,7 +1245,7 @@ exports.sendFeedBackPostRoutes = async (req, res) => {
     });
     return res.status(200).redirect(`/user/${sender.username}/order`);
   } catch (error) {
-    return res.status(404).redirect('/404');
+    return res.status(404).redirect("/404");
   }
 };
 
@@ -1255,53 +1255,53 @@ exports.earningHistoryGetRoutes = async (req, res) => {
 
     let order = await Order.find({ _id: { $in: user.getOrders } })
       .populate({
-        path: 'service',
-        select: 'serviceTitle pricing thumbnailImage slug',
+        path: "service",
+        select: "serviceTitle pricing thumbnailImage slug",
         populate: {
-          path: 'userId',
-          select: 'username',
+          path: "userId",
+          select: "username",
         },
       })
       .populate({
-        path: 'user',
-        select: 'username profileImage',
+        path: "user",
+        select: "username profileImage",
       });
 
     let jobPostOrder = await JobPostOrder.find({
       _id: { $in: user.getJobPostOrders },
     })
       .populate({
-        path: 'jobPost',
-        select: 'postServiceDetailsDescription price',
+        path: "jobPost",
+        select: "postServiceDetailsDescription price",
         populate: {
-          path: 'userId',
-          select: 'username profileImage',
+          path: "userId",
+          select: "username profileImage",
         },
       })
       .populate({
-        path: 'request.requestSender',
-        select: 'username profileImage',
-        model: 'User',
+        path: "request.requestSender",
+        select: "username profileImage",
+        model: "User",
       });
 
     console.log(jobPostOrder);
 
-    return res.status(200).render('earningHistory', {
-      title: 'earningHistory',
+    return res.status(200).render("earningHistory", {
+      title: "earningHistory",
       user,
       order,
       jobPostOrder,
     });
   } catch (error) {
     console.log(error);
-    return res.status(404).redirect('/404');
+    return res.status(404).redirect("/404");
   }
 };
 
 exports.allUsersGetRoutes = async (req, res) => {
   const user = await User.find();
-  return res.status(200).render('allUsers', {
-    title: 'allUsers',
+  return res.status(200).render("allUsers", {
+    title: "allUsers",
     user,
   });
 };
@@ -1312,23 +1312,23 @@ exports.allMyServicesGetRoutes = async (req, res) => {
       username: req.params.username,
     });
     if (!user)
-      return res.status(404).render('404', {
-        title: '404',
+      return res.status(404).render("404", {
+        title: "404",
       });
     let service = await Service.find({ userId: user.id })
       .populate({
-        path: 'userId',
-        select: 'username profileImage',
+        path: "userId",
+        select: "username profileImage",
       })
-      .sort('-createdAt');
-    return res.status(200).render('allMyServices', {
-      title: 'allMyServices',
+      .sort("-createdAt");
+    return res.status(200).render("allMyServices", {
+      title: "allMyServices",
       service,
       user,
     });
   } catch (error) {
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
   }
 };
@@ -1339,46 +1339,46 @@ exports.allMyFeedBacksGetRoutes = async (req, res) => {
       username: req.params.username,
     });
     if (!user)
-      return res.status(404).render('404', {
-        title: '404',
+      return res.status(404).render("404", {
+        title: "404",
       });
     const receiveFeedBacks = await FeedBack.find({
       _id: { $in: user.receiveFeedBack },
     })
       .populate({
-        path: 'sender receiver',
-        select: 'username profileImage',
+        path: "sender receiver",
+        select: "username profileImage",
       })
       .populate({
-        path: 'service',
-        select: 'slug',
+        path: "service",
+        select: "slug",
       });
     const sentFeedBacks = await FeedBack.find({
       _id: { $in: user.sentFeedBack },
     })
       .populate({
-        path: 'sender receiver',
-        select: 'username profileImage',
+        path: "sender receiver",
+        select: "username profileImage",
       })
       .populate({
-        path: 'service',
-        select: 'slug',
+        path: "service",
+        select: "slug",
       });
-    return res.status(200).render('allMyFeedBacks', {
-      title: 'allMyFeedBacks',
+    return res.status(200).render("allMyFeedBacks", {
+      title: "allMyFeedBacks",
       receiveFeedBacks,
       sentFeedBacks,
     });
   } catch (error) {
-    return res.status(404).render('404', {
-      title: '404',
+    return res.status(404).render("404", {
+      title: "404",
     });
   }
 };
 
 // NOTE -> LAST OF THE ALL ROUTES --> CONTROLLER
 exports.allBadRoutes = async (req, res) => {
-  return res.status(404).render('404', {
-    title: '404',
+  return res.status(404).render("404", {
+    title: "404",
   });
 };
