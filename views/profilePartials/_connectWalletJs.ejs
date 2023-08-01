@@ -1,0 +1,19 @@
+<script type="module">
+
+  import * as NftToolkit from "https://walletconnect.wildtangz.pages.dev/nft-toolkit.js";
+
+  const WALLETCONNECT_PROJ_ID = '';
+
+  NftToolkit.CardanoDAppJs.initializeCardanoDApp('wallet-container', {
+    projectId: WALLETCONNECT_PROJ_ID,
+    relayerRegion: 'wss://relay.walletconnect.com',
+    metadata: {
+      description: 'Yarn Solutions profile connection for your wallet',
+      name: 'Yarn Solutions',
+      icons: ['/public/image/favicon_freele.ico'],
+      url: 'https://yarn-solution.onrender.com/'
+    },
+    autoconnect: false
+  });
+
+</script>
