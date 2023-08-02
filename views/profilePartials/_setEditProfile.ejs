@@ -161,10 +161,39 @@
             </div>
           </div>
         </div>
-        <div>
-          <button type="submit" class="btn btn-lg w-100 btn-clr">Update</button>
+        <div class="row mb-3">
+          <div class="col">
+            <button type="submit" class="btn btn-lg w-100 btn-clr">Update</button>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col">
+            <div class="form-floating fs-4 fw-bold text-start w-100 text">
+              Your Wallets
+            </div>
+            <div class="form-floating">
+              <div id="wallet-removal-container"></div>
+              <div id="wallet-removal-loading">Loading linked wallets...</div>
+              <span id="wallet-removal-errors" class="mb-3 alert-message d-none"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col">
+            <div id="wallet-container" class="dropdown-parent mb-3 btn btn-lg w-100 btn-clr">
+              Loading Wallet Connector, Please Wait...
+            </div>
+            <div id="wallet-connector-loading" class="mb-3 btn btn-lg w-100 btn-clr d-none">
+              Wallet Connection in Progress, Wait for Prompts...
+            </div>
+            <span id="wallet-connector-errors" class="mb-3 alert-message d-none"></span>
+            <span id="wallet-connector-success" class="mb-3 text-success d-none"></span>
+          </div>
         </div>
       </form>
     </div>
   </div>
 </div>
+
+<!-- Include Wallet Connection dApp binding -->
+<%- include('./_connectWalletJs') %>

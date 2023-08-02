@@ -70,6 +70,18 @@ router.put(
   controller.editProfilePutRoutes
 );
 
+// ADD/REMOVE WALLET API
+router.put(
+  '/user/:username/add_wallet',
+  [isAuthenticated],
+  controller.editProfileAddWalletRoutes
+);
+router.delete(
+  '/user/:username/remove_wallet/:wallet',
+  [isAuthenticated],
+  controller.editProfileRemoveWalletRoutes
+);
+
 // UPLOAD SERVICE API
 router.post(
   '/user/:username/create_service',

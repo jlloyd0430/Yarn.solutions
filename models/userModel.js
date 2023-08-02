@@ -53,7 +53,8 @@ const userSchema = new mongoose.Schema(
     isAdmin: {
       type: Boolean,
       default: false
-    }
+    },
+    wallets: { type: Array }
   },
   { timestamps: true }
 );
