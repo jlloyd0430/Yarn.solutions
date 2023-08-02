@@ -12,6 +12,8 @@ const FeedBack = require("../models/feedBackModel");
 const JobPost = require("../models/jobPostModel");
 const JobPostOrder = require("../models/jobPostOrderModel");
 
+const BLOCKFROST_KEY = 'mainnetsbC9rb0YuOhyZKL4WXV1Dhm8vt3CBLRL';
+
 exports.homeRoutes = async (req, res) => {
   const service = await Service.find()
     .populate({
@@ -381,6 +383,79 @@ exports.editProfilePutRoutes = async (req, res) => {
     res.status(400).render("editProfile", {
       title: "editProfile",
       user: user,
+    });
+  }
+};
+
+async function getLatestBlockHash() {
+  const latestEpoch = await fetch('https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'project_id': BLOCKFROST_KEY
+    }
+  }).then(res => res.json());
+  if (!latestEpoch.first_block_time) {
+    throw latestEpoch;
+  }
+  return latestEpoch.first_block_time.toString();
+}
+
+async function getLucidCardanoModule() {
+  const LucidCardanoModule = import("lucid-cardano");
+  return (await LucidCardanoModule);
+}
+
+exports.editProfileAddWalletRoutes = async (req, res) => {
+  try {
+    const username = req.session.sUser.username
+    let findUser = await User.findOne({ username: username });
+    if (!findUser) {
+      throw `User "${username}" not found`;
+    }
+
+    const LucidCardano = await getLucidCardanoModule();
+    const blockHash = await getLatestBlockHash();
+    const lucid = await LucidCardano.Lucid.new();
+    const expectedMsg = Buffer.from(blockHash).toString('hex');
+    const wallet = req.body.wallet;
+    if (!lucid.verifyMessage(wallet, expectedMsg, req.body.signedMsg)) {
+      throw `Invalid signature for wallet "${wallet}"`;
+    }
+
+    const wallets = findUser.wallets || [];
+    if (wallets.includes(wallet)) {
+      throw `Wallet "${wallet}" already linked to ${username}`;
+    }
+
+    const userUpdates = await User.updateOne(
+      {
+        username: req.session.sUser.username,
+      },
+      {
+        $push: {
+          wallets: wallet
+        }
+      },
+      {
+        new: false,
+        upsert: false
+      }
+    );
+    if (userUpdates.nModified !== 1) {
+      throw `User "${username}" not updated (${userUpdates.modifiedCount} update count)`;
+    }
+
+    console.log(`Wallet "${wallet}" added to user "${username}"!`);
+    return res.status(200).json({
+      statusCode: 200,
+      message: `Wallet "${wallet}" added to user "${username}"!`
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({
+      statusCode: 400,
+      message: error
     });
   }
 };
