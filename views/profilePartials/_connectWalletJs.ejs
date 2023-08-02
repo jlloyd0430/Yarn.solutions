@@ -5,6 +5,7 @@
 
   const BLOCKFROST_KEY = NftToolkit.Secrets.BLOCKFROST_PROJ;
   const WALLETCONNECT_PROJ_ID = '';
+  const LINKED_WALLETS = '<%= user.wallets || '' %>'.split(',').filter(el => el);
 
   window.addEventListener("message", async event => {
     // We only accept messages from ourselves
@@ -23,6 +24,8 @@
           await sendResponseToBackend(stakeKey, signature);
           document.getElementById('wallet-connector-success').textContent = `Added wallet "${stakeKey}!"`;
           document.getElementById('wallet-connector-success').classList.remove('d-none');
+          document.getElementById('wallet-removal-container').innerHTML += removalDomFor(stakeKey);
+          wireUpDeleteIcons();
         } catch (err) {
           document.getElementById('wallet-connector-errors').textContent = err.message;
           document.getElementById('wallet-connector-errors').classList.remove('d-none');
@@ -36,6 +39,46 @@
         break;
     }
   }, false);
+
+  async function handleTrashIconClick(trashIconDom) {
+    document.getElementById('wallet-removal-errors').classList.add('d-none');
+    try {
+      await sendDeleteResponse(trashIconDom.getAttribute("data-stake-key"));
+      trashIconDom.parentNode.classList.add('d-none');
+    } catch (err) {
+      document.getElementById('wallet-removal-errors').textContent = err.message;
+      document.getElementById('wallet-removal-errors').classList.remove('d-none');
+    }
+  }
+
+  function wireUpDeleteIcons() {
+    document.querySelectorAll('.delete-wallet').forEach(element => {
+      element.addEventListener('click', e => {
+        e && e.preventDefault() && e.stopPropagation();
+        handleTrashIconClick(e.currentTarget);
+      });
+    });
+  }
+
+  function removalDomFor(wallet) {
+    return `<div class="mb-1 d-flex justify-content-between align-items-center">
+      <div>
+        ${wallet}
+      </div>
+      <div class="delete-wallet alert-message" style="cursor: pointer" data-stake-key="${wallet}">
+        <i class="fas fa-trash"></i>
+      </div>
+    </div>`;
+  }
+
+  function loadWalletDom() {
+    LINKED_WALLETS.forEach(wallet => {
+      document.getElementById('wallet-removal-container').innerHTML += removalDomFor(wallet);
+    });
+    wireUpDeleteIcons();
+
+    document.getElementById('wallet-removal-loading').classList.add('d-none');
+  }
 
   async function getWalletStake(blockfrostKey) {
     const lucid = await selectConnectedWallet(NftToolkit, blockfrostKey);
@@ -82,6 +125,22 @@
     }
     return validationResponse.resp;
   }
+
+  async function sendDeleteResponse(stakeKey) {
+    const validationResponse = await fetch(`/user/<%= user.username%>/remove_wallet/${stakeKey}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    }).then(res => res.json());
+    if (validationResponse.statusCode !== 200) {
+      throw validationResponse;
+    }
+    return validationResponse.resp;
+  }
+
+  loadWalletDom();
 
   NftToolkit.CardanoDAppJs.initializeCardanoDApp('wallet-container', {
     projectId: WALLETCONNECT_PROJ_ID,

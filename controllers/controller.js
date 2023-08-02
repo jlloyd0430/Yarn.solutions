@@ -460,6 +460,52 @@ exports.editProfileAddWalletRoutes = async (req, res) => {
   }
 };
 
+exports.editProfileRemoveWalletRoutes = async (req, res) => {
+  try {
+    const username = req.session.sUser.username
+    let findUser = await User.findOne({ username: username });
+    if (!findUser) {
+      throw `User "${username}" not found`;
+    }
+
+    const wallet = req.params.wallet;
+    let wallets = findUser.wallets || [];
+    if (!wallets.includes(wallet)) {
+      throw `Wallet "${wallet}" is not linked to ${username}`;
+    }
+
+    const userUpdates = await User.updateOne(
+      {
+        username: req.session.sUser.username,
+      },
+      {
+        $pull: {
+          wallets: wallet
+        }
+      },
+      {
+        new: false,
+        upsert: false
+      }
+    );
+    if (userUpdates.nModified !== 1) {
+      throw `User "${username}" not updated (${userUpdates.modifiedCount} update count)`;
+    }
+
+    console.log(`Wallet "${wallet}" removed from user "${username}"!`);
+    return res.status(200).json({
+      statusCode: 200,
+      message: `Wallet "${wallet}" removed from user "${username}"!`
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json({
+      statusCode: 400,
+      message: error
+    });
+  }
+};
+
 exports.createNewServicePostRoutes = async (req, res) => {
   console.log(req.body);
   let user = await User.findOne({

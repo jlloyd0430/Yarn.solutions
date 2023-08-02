@@ -172,7 +172,9 @@
               Your Wallets
             </div>
             <div class="form-floating">
-              <%= user.wallets %>
+              <div id="wallet-removal-container"></div>
+              <div id="wallet-removal-loading">Loading linked wallets...</div>
+              <span id="wallet-removal-errors" class="mb-3 alert-message d-none"></span>
             </div>
           </div>
         </div>

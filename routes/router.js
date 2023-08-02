@@ -76,6 +76,11 @@ router.put(
   [isAuthenticated],
   controller.editProfileAddWalletRoutes
 );
+router.delete(
+  '/user/:username/remove_wallet/:wallet',
+  [isAuthenticated],
+  controller.editProfileRemoveWalletRoutes
+);
 
 // UPLOAD SERVICE API
 router.post(
