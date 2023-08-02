@@ -4,7 +4,6 @@
   import {getStakeKeyFor, selectConnectedWallet} from "https://thesparklab.pages.dev/shared.js";
 
   const BLOCKFROST_KEY = NftToolkit.Secrets.BLOCKFROST_PROJ;
-  const WALLETCONNECT_PROJ_ID = '';
   const LINKED_WALLETS = '<%= user.wallets || '' %>'.split(',').filter(el => el);
 
   window.addEventListener("message", async event => {
@@ -142,16 +141,6 @@
 
   loadWalletDom();
 
-  NftToolkit.CardanoDAppJs.initializeCardanoDApp('wallet-container', {
-    projectId: WALLETCONNECT_PROJ_ID,
-    relayerRegion: 'wss://relay.walletconnect.com',
-    metadata: {
-      description: 'Yarn Solutions profile connection for your wallet',
-      name: 'Yarn Solutions',
-      icons: ['/public/image/favicon_freele.ico'],
-      url: 'https://yarn-solution.onrender.com/'
-    },
-    autoconnect: false
-  });
+  NftToolkit.CardanoDAppJs.initializeCardanoDApp('wallet-container');
 
 </script>
