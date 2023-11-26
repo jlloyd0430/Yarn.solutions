@@ -27,23 +27,7 @@
       </button>
 
       <div id="navbar_main" class="mobile-offcanvas">
-        <!-- <form action="/search" method="get">
-          <div class="offcanvas-header">
-            <a class="navbar-brand logo-title" href="/">Yarn</a>
-            <button class="btn-close float-end mt-1"></button>
-            <div class="input-group mt-4">
-              <input
-                type="search"
-                class="form-control"
-                name="searchItem"
-                aria-label="Sizing example input"
-                placeholder="Search From Here..."
-                required
-              />
-              <button class="btn btn-clr searchBtn">Search</button>
-            </div>
-          </div>
-        </form> -->
+    
 
         <ul class="navbar-nav">
           <li class="nav-item active">
@@ -128,14 +112,9 @@
                   class="dropdown-item"
                   href="/user/<%=sUser.username%>/post_request"
                 >
-                  Post a New Request
+                  Post a New Job
                 </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="/user/<%= sUser.username %>/earning_history"
-                  >Earning History</a
-                >
-              </li>              
+              </li>      
               <li>
                 <a class="dropdown-item" href="/messages/<%= sUser.username %>"
                   >Messages</a
