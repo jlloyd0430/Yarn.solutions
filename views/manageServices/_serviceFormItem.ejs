@@ -239,4 +239,46 @@
   <span class="mb-3 alert-message">Service Description is not empty</span>
   <% } %>
 </div>
+<% if(feedbacks.length > 0){ %>
+  <div class="row">
+    <div class="col-lg-8 mb-5">
+      <div class="bg-white p-3">
+        <% feedbacks.forEach(sFeedBack => { %>
+        <div class="d-flex my-5">
+          <div class="flex-shrink-0">
+            <% if(sFeedBack.sender.profileImage) { %>
+            <img
+              class="rounded-circle"
+              height="50"
+              width="50"
+              src="/public/uploads/<%=sFeedBack.sender.profileImage%>"
+            />
+            <% } else { %>
+            <img
+              class="rounded-circle"
+              height="50"
+              width="50"
+              src="/public/image/default-profile-photo.png"
+            />
+            <% } %>
+          </div>
+          <div class="ms-3 w-100 px-3" style="background-color: #f5f5f5">
+            <p class="mt-1"><strong><%=sFeedBack.sender.username%></strong></p>
+            <p><%= sFeedBack.feedbacktext %></p>
+            <% for (let ratingIndex = 0; ratingIndex < sFeedBack.rating;
+            ratingIndex++) { %>
+            <i class="fas fa-star mb-3" style="color: #ff9800"></i>
+            <% } %> <% if(sFeedBack.rating < 5) { %> <% for (let ratingIndex =
+            sFeedBack.rating + 1; ratingIndex <= 5; ratingIndex++) { %>
+            <i class="fas fa-star my-2"></i>
+            <% } %> <% } %>
+            <p class="text-muted">Published <%= momentTimeFromNow(sFeedBack.createdAt) %></p>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+    </div>
+    <div class="col-lg-4 d-lg-block d-none"></div>
+  </div>
+  <% } %>
 
