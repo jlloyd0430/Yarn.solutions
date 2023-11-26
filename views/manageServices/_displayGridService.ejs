@@ -53,7 +53,7 @@
       <div class="card-footer text-muted">
         <span><%= momentTimeFromNow(singleService.createdAt) %></span>
         <span class="float-end"
-          ><b>Starting AT $<%= (singleService.pricing.price[0] * 1).toFixed(2) %></b></span
+          ><b>Starting AT <%= (singleService.pricing.price[0] * 1) %> Ada</b></span
         >
       </div>
     </div>
