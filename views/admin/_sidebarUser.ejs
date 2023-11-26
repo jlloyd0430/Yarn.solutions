@@ -16,9 +16,7 @@
           <th scope="col">getJobPostOrders</th>
           <th scope="col">totalFeedBackSent</th>
           <th scope="col">totalFeedBackReceive</th>
-          <th scope="col">totalEarnFromServices($)</th>
-          <th scope="col">totalEarnFromJobPosts($)</th>
-          <th scope="col">totalEarn($)</th>
+       
         </tr>
       </thead>
       <tbody>
@@ -54,9 +52,6 @@
           <td><%= singleUser.getJobPostOrders.length %></td>
           <td><%= singleUser.sentFeedBack.length %></td>
           <td><%= singleUser.receiveFeedBack.length %></td>
-          <td><%= singleUser.earnings.totalEarning_Service %></td>
-          <td><%= singleUser.earnings.totalEarning_JobPost %></td>
-          <td><%= singleUser.earnings.totalEarning %></td>
         </tr>
         <% }) %>
       </tbody>
