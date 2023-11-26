@@ -113,7 +113,7 @@
             <span><b><%= service.pricing.packageName[index] %></b></span>
             <b
               ><span class="float-end"
-                >$<%= (service.pricing.price[index] * 1).toFixed(2) %></span
+                ><%= (service.pricing.price[index] * 1) %> Ada</span
               ></b
             >
             <p class="my-4">
@@ -125,8 +125,8 @@
             <a
               href="/user/<%=service.userId.username%>/service/<%=service.slug%>/checkout?index=<%=index%>"
               class="btn btn-clr w-100"
-              >Continue ($<%= (service.pricing.price[index] *
-              1).toFixed(2)%>)</a
+              >Continue (<%= (service.pricing.price[index] *
+              1)%> Ada)</a
             >
           </div>
           <% } %>
